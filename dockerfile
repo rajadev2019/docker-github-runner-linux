@@ -1,14 +1,14 @@
 # base image
-FROM ubuntu:20.04
+FROM ubuntu:latest
 
 #input GitHub runner version argument
 ARG RUNNER_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
-LABEL Author="Marcel L"
-LABEL Email="pwd9000@hotmail.co.uk"
-LABEL GitHub="https://github.com/Pwd9000-ML"
-LABEL BaseImage="ubuntu:20.04"
+LABEL Author="Ranajit Koley"
+LABEL Email="raja.dev2019@gmail.com"
+LABEL GitHub="https://github.com/rajadev2019"
+LABEL BaseImage="ubuntu:latest"
 LABEL RunnerVersion=${RUNNER_VERSION}
 
 # update the base packages + add a non-sudo user
@@ -16,7 +16,7 @@ RUN apt-get update -y && apt-get upgrade -y && useradd -m docker
 
 # install the packages and dependencies along with jq so we can parse JSON (add additional packages as necessary)
 RUN apt-get install -y --no-install-recommends \
-    curl nodejs wget unzip vim git azure-cli jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip
+    curl nodejs wget unzip vim git azure-cli jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip dotnet-sdk-7.0 docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # cd into the user directory, download and unzip the github actions runner
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
