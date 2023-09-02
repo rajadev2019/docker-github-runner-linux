@@ -1,8 +1,8 @@
 # base image
-FROM ubuntu:latest
+FROM --platform=linux/amd64 ubuntu:latest
 
 #input GitHub runner version argument
-ARG RUNNER_VERSION
+ARG RUNNER_VERSION=2.308.0
 ENV DEBIAN_FRONTEND=noninteractive
 
 LABEL Author="Ranajit Koley"
@@ -16,7 +16,15 @@ RUN apt-get update -y && apt-get upgrade -y && useradd -m docker
 
 # install the packages and dependencies along with jq so we can parse JSON (add additional packages as necessary)
 RUN apt-get install -y --no-install-recommends \
-    curl nodejs wget unzip vim git azure-cli jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip dotnet-sdk-7.0 docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    curl nodejs wget unzip vim git jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip
+
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+RUN apt install -y apt-transport-https ca-certificates curl software-properties-common
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu `lsb_release -cs` test"
+RUN apt update -y
+RUN apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # cd into the user directory, download and unzip the github actions runner
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
