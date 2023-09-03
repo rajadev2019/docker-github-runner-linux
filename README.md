@@ -6,3 +6,6 @@ For more details on using this repo, check out my blog post: [Self Hosted GitHub
 
 Also see my GitHub repository: [docker-github-runner-windows](https://github.com/Pwd9000-ML/docker-github-runner-windows) for building a self hosted GitHub runner as a windows container. 
 
+
+# Work in Progress - To be resumed later, need to check DIND, sysbox and Kaniko options
+# Need to know what does Github or Azure DevOps runners use ? Aren't they containers ?

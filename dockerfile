@@ -1,5 +1,5 @@
 # base image
-FROM --platform=linux/amd64 ubuntu:latest
+FROM --platform=linux/amd64 docker:dind
 
 #input GitHub runner version argument
 ARG RUNNER_VERSION=2.308.0
@@ -8,23 +8,27 @@ ENV DEBIAN_FRONTEND=noninteractive
 LABEL Author="Ranajit Koley"
 LABEL Email="raja.dev2019@gmail.com"
 LABEL GitHub="https://github.com/rajadev2019"
-LABEL BaseImage="ubuntu:latest"
+LABEL BaseImage="docker:dind"
 LABEL RunnerVersion=${RUNNER_VERSION}
 
 # update the base packages + add a non-sudo user
-RUN apt-get update -y && apt-get upgrade -y && useradd -m docker
+RUN apk update && apk upgrade && adduser -D docker
+
+RUN apk add --no-cache bash
 
 # install the packages and dependencies along with jq so we can parse JSON (add additional packages as necessary)
-RUN apt-get install -y --no-install-recommends \
-    curl nodejs wget unzip vim git jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip
+RUN apk add --update \
+     # -y --no-install-recommends \
+     curl nodejs wget unzip vim git jq alpine-sdk libressl-dev libffi-dev python3 py3-virtualenv python3-dev py3-pip
 
-RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+RUN pip install azure-cli
+#RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
-RUN apt install -y apt-transport-https ca-certificates curl software-properties-common
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu `lsb_release -cs` test"
-RUN apt update -y
-RUN apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+#RUN apt install -y apt-transport-https ca-certificates curl software-properties-common
+#RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+#RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu `lsb_release -cs` test"
+#RUN apt update -y
+#RUN apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # cd into the user directory, download and unzip the github actions runner
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
@@ -32,7 +36,8 @@ RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
     && tar xzf ./actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 
 # install some additional dependencies
-RUN chown -R docker ~docker && /home/docker/actions-runner/bin/installdependencies.sh
+RUN chown -R docker ~docker && apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib libgdiplus dotnet7-sdk
+# /home/docker/actions-runner/bin/installdependencies.sh
 
 # add over the start.sh script
 ADD scripts/start.sh start.sh
